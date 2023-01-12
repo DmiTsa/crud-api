@@ -25,6 +25,11 @@
         Server should answer with status code 400 and corresponding message if userId is invalid (not uuid)
         Server should answer with status code 404 and corresponding message if record with id === userId doesn't exist
 
+    POST api/users is used to create record about new user and store it in database
+        Server should answer with status code 201 and newly created record
+        Server should answer with status code 400 and corresponding message if request body does not contain required fields
+        (Сервер должен ответить кодом состояния 400 и соответствующим сообщением, если тело запроса не содержит обязательных полей.)
+
 <...........................................>
 
 2.Users are stored as objects that have following properties:
@@ -32,3 +37,5 @@ id — unique identifier (string, uuid) generated on server side
 username — user's name (string, required)
 age — user's age (number, required)
 hobbies — user's hobbies (array of strings or empty array, required)
+
+https://learn.javascript.ru/fetch

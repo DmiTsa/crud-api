@@ -1,7 +1,17 @@
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
+import { buffer } from 'node:stream/consumers';
+
+interface User {
+  id?: string;
+  username?: string;
+  age?: number;
+  hobbies?: string[];
+}
 
 const PORT = 4000;
-const users = [{ id: '001', username: 'user11', age: 30, hobbies: ['hobby1'] }];
+const users: string[] = [
+  { id: '001', username: 'user11', age: 30, hobbies: ['hobby1'] },
+];
 const baseUsersEndpoint = '/api/users';
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -9,6 +19,9 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     //create getUsersController postUserController
     case 'GET':
       getUsersController(req, res, baseUsersEndpoint);
+      break;
+    case 'POST':
+      postUsersController(req, res, baseUsersEndpoint);
       break;
     default:
       res.statusCode = 500;
@@ -38,35 +51,42 @@ function getUsersController(
   // console.log(userId);
 }
 
-// const server = createServer(
-//   (request: IncomingMessage, response: ServerResponse) => {
-//     switch (request.method) {
-//       case 'GET':
-//         getController(request, response);
-//         break;
-//       case 'POST':
-//         postController(request, response);
-//         break;
-//       default:
-//         response.statusCode = 500;
-//         response.write(
-//           `Error 500: request type ${request.method} is not supported`
-//         );
-//         response.end();
-//         break;
-//     }
-//   }
-// );
-
-// import { IncomingMessage, ServerResponse } from 'http';
-// import users from '../data/users';
-
-// const getController = (req: IncomingMessage, res: ServerResponse) => {
+function postUsersController(
+  req: IncomingMessage,
+  res: ServerResponse,
+  baseEndpoint: string
+) {
+  let newUser: string;
+  req.on('data', (chunk: string) => {
+    newUser = chunk.toString();
+    //validation
+    users.push(newUser);
+  });
+  req.on('end', () => {
+    res.end(JSON.stringify(users));
+    return;
+  });
+}
+// const postController = (req: IncomingMessage, res: ServerResponse) => {
 //   switch (req.url) {
 //     case `/api/users`:
-//       res.statusCode = 200;
-//       res.setHeader('Content-Type', 'application/json');
-//       res.end(JSON.stringify(users));
+//       let body: User;
+//       req.on('data', (chunk: User) => {
+//         body = chunk;
+//       });
+//       req.on('end', () => {
+//         console.log(userValidator(body));
+
+//         if (true) {
+//           users.push(body);
+//           res.statusCode = 201;
+//           res.setHeader('Content-Type', 'application/json');
+//           res.end(body);
+//         } else {
+//           res.statusCode = 400;
+//           res.end('Invalid parameter(s)');
+//         }
+//       });
 //       break;
 //     default:
 //       res.statusCode = 404;
@@ -75,4 +95,10 @@ function getUsersController(
 //       break;
 //   }
 // };
-// export default getController;
+
+// export default postController;
+
+// //functions
+// function userValidator(body: User): boolean {
+//   return body.username && body.age && body.hobbies ? true : false;
+// }
